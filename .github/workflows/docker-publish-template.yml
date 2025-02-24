@@ -14,7 +14,7 @@ jobs:
         env:
           DP_APP_ID: 'civicrm'
           APP_ROOT: '/var/www/html'        
-          WEB_ROOT: '/var/www/html/web'
+          WEB_ROOT: '/var/www/html'
           CODES_USER_DATA_DIR: '/var/www/html/.vscode'
           CODES_WORKING_DIR: '/var/www/html'
           APACHE_RUN_USER: 'www'
@@ -55,14 +55,15 @@ jobs:
 
     - name: Setup Drupal
       run: |
-        echo "PREPARE DIR FOR INSTALL" 
+        echo "PREPARE DIR FOR INSTALL"
         docker exec ${{ job.services.webserver.id }} bash -c "sudo rm -rf \$APP_ROOT && sudo mkdir -p \$APP_ROOT"
         docker exec ${{ job.services.webserver.id }} bash -c "sudo cp -r /app/. \$APP_ROOT/." 
         docker exec ${{ job.services.webserver.id }} bash -c "sudo chown -R www:www \$APP_ROOT"
         docker exec ${{ job.services.webserver.id }} bash -c "export && cd \$APP_ROOT && ls -al"
-        echo "INSTALL CUSTOM PACKAGE" 
+        echo "INSTALL CUSTOM PACKAGE"
+        docker exec ${{ job.services.webserver.id }} bash -c "sudo chown -R www:www \$APP_ROOT"
         docker exec ${{ job.services.webserver.id }} bash -c "\$APP_ROOT/.devpanel/custom_package_installer.sh" 
-        echo "INSTALL DRUPAL" 
+        echo "INSTALL DRUPAL"
         docker exec ${{ job.services.webserver.id }} bash -c "cd \$APP_ROOT && ls -al"
         docker exec ${{ job.services.webserver.id }} bash -c "\$APP_ROOT/.devpanel/re-config.sh" 
 

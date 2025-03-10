@@ -14,8 +14,13 @@
 #
 # For GNU Affero General Public License see <https://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
+SETTINGS_FILES_PATH="$WEB_ROOT/sites/default/settings.php"
+#== Generate hash salt
+echo 'Generate hash salt ...'
+DRUPAL_HASH_SALT=$(openssl rand -hex 32);
+sudo sed -i -e "s/^\$settings\['hash_salt'\].*/\$settings\['hash_salt'\] = '$DRUPAL_HASH_SALT';/g" $SETTINGS_FILES_PATH
 
-  #== Import database
+#== Import database
 if [[ $(mysql -h$DB_HOST -P$DB_PORT -u$DB_USER -p$DB_PASSWORD $DB_NAME -e "show tables;") == '' ]]; then
   if [[ -f "$APP_ROOT/.devpanel/dumps/db.sql.tgz" ]]; then
     echo  'Extract mysql files ...'
@@ -26,3 +31,6 @@ if [[ $(mysql -h$DB_HOST -P$DB_PORT -u$DB_USER -p$DB_PASSWORD $DB_NAME -e "show 
     sudo rm -rf $APP_ROOT/.devpanel/dumps/db.sql.tgz
   fi
 fi
+
+echo 'cache:rebuild'
+drush cr;
